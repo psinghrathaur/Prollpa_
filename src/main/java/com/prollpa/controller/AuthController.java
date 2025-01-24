@@ -1,68 +1,66 @@
 package com.prollpa.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import com.prollpa.payload.LoginDto;
-import com.prollpa.payload.RegisterDto;
-import com.prollpa.payload.UserDto;
-import com.prollpa.service.RegisterUserService;
-
+import com.prollpa.payload.LoginResponse;
+import com.prollpa.security.JwtService;
+import com.prollpa.security.LdapUserDetailsService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
-@Tag(name = "Auth Controller Api", description = "Authentication Management")
+@Tag(name = "Auth Controller API", description = "Authentication Management")
 public class AuthController {
-	@Autowired
-	private RegisterUserService registerUserService;
-	@Autowired
-	private AuthenticationManager authenticationManager;
-//	@PostMapping("/register")
-//	public ResponseEntity<String> saveUser(@RequestBody RegisterDto user){
-//		RegisterDto saveUser = registerUserService.saveUser(user);
-//		if(saveUser!=null) {
-//			return ResponseEntity.status(HttpStatus.CREATED).body("user Register successfully");
-//		}else {
-//			return ResponseEntity.status(HttpStatus.CREATED).body("user not Registered");
-//		}
-//	}
-//	@PostMapping("/login")
-//	public ResponseEntity<String> loginByUserNameAndPassword(@RequestBody LoginDto dto ){
-//		boolean loginCheck=registerUserService.findByUsernameAndPassword(dto.getUsername(), dto.getPassword());
-//		if(loginCheck) {
-//			return ResponseEntity.status(HttpStatus.OK).body("user Login successfully");
-//		}else {
-//			return ResponseEntity.status(HttpStatus.OK).body("please enter the valid username and password");
-//		}
-//	}
-	
-	
-	
-	 @PostMapping("/login")
-	 @Operation(summary = "login", description = "check the username and password is correct or not")
-	 public ResponseEntity<String> login(@RequestBody LoginDto loginDto){
-		 try {
-		 Authentication authentication = authenticationManager.authenticate(
-                 new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword())
-         );
-		 return ResponseEntity.status(HttpStatus.OK).body("Authentication Successfull");
-		 }catch(AuthenticationException e){
-			 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("please enter the valid credentials"+e);
-		 }
-	 }
 
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
+    @Autowired
+    private JwtService jwtService;
+    @Autowired
+    private LdapUserDetailsService ldapService;
+    @Value("${jwtTokenExpiration}")
+    private int tokenExpiryTime;
+
+    
+    @PostMapping("/ldapLogin")
+    @Operation(summary = "Authenticate user and generate JWT token")
+    public ResponseEntity<?> login(@RequestBody LoginDto loginDto) {
+    	ldapService.loadUserByUsername(loginDto.getUsername());
+        try {
+            // Authenticate the user
+     
+            Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword())
+            );
+
+            // Generate JWT token upon successful authentication
+            String token = jwtService.generateToken(loginDto.getUsername());
+            LoginResponse loginResponse=LoginResponse.builder().jwtToken(token).validateTime(tokenExpiryTime+" Minutes").authenticationStatus("Authentication Successfully!").build();
+            
+            return ResponseEntity.ok(loginResponse);
+
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication failed: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
+        }
+        
+    }
+
+   
 }

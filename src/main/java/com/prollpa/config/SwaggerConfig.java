@@ -25,8 +25,8 @@ public class SwaggerConfig {
     @Bean
     public GroupedOpenApi policyGroup() {
         return GroupedOpenApi.builder()
-                .group("login")
-                .pathsToMatch("/**/**")  // Define the path to be documented
+                .group("com.prollpa") // This must match the name used in Swagger UI config
+                .pathsToMatch("/**/**") // Match all paths or specific ones
                 .build();
     }
 }
