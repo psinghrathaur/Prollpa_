@@ -24,8 +24,9 @@ public class VSCServiceImpl implements VSCService{
 	}
 
 	@Override
-	public VSC getVSCById(long vscId) {
+	public VSC getVSCById(Long vscId) {
 		// TODO Auto-generated method stub
+		
 		return vscRepository.findById(vscId).orElseThrow(
 				()-> new ResourceNotFoundException("VSC not found with this id "+vscId));
 		

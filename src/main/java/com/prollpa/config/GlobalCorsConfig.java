@@ -20,4 +20,5 @@ public class GlobalCorsConfig implements WebMvcConfigurer {
                 .allowedHeaders("Content-Type", "Authorization")  // Allow these headers in the request
                 .allowCredentials(true); // Allow sending credentials (cookies, HTTP authentication)
     }
+    
 }

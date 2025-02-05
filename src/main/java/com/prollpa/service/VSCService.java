@@ -6,7 +6,7 @@ import com.prollpa.entity.VSC;
 
 public interface VSCService {
 	public VSC saveVSC(VSC vsc);
-	public VSC getVSCById(long vscId);
+	public VSC getVSCById(Long vscId);
 	public List<VSC> getVSCList();
 	
 

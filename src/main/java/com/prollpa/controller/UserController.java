@@ -2,6 +2,7 @@ package com.prollpa.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,6 +43,7 @@ public class UserController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(saveUser);
 	}
 	@GetMapping("/getUserByUsername")
+	@CrossOrigin
 	@Operation(summary = "getUserByUsername", description = "this api will give the User details")
     public ResponseEntity<UserDto> getUserByUsername(@RequestParam("username")String username) {
         return ResponseEntity.ok(userService.getUserByUsername(username));

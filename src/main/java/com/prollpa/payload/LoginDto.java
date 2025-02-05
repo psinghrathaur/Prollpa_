@@ -1,31 +1,15 @@
 package com.prollpa.payload;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-
+@Data
 public class LoginDto {
+	@NotNull(message="username can not be null")
 	private String username;
+	@NotNull(message="username can not be null")
 	private String password;
-	public String getUsername() {
-		return username;
-	}
-	public void setUsername(String username) {
-		this.username = username;
-	}
-	public String getPassword() {
-		return password;
-	}
-	public void setPassword(String password) {
-		this.password = password;
-	}
-	public LoginDto(String username, String password) {
-		super();
-		this.username = username;
-		this.password = password;
-	}
-	public LoginDto() {
-		
-	}
+	
 
 }

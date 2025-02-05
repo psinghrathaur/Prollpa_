@@ -1,5 +1,6 @@
 package com.prollpa.controller;
 
+import com.prollpa.exception.ResourceNotFoundException;
 import com.prollpa.payload.LoginDto;
 import com.prollpa.payload.LoginResponse;
 import com.prollpa.security.JwtService;
@@ -7,6 +8,8 @@ import com.prollpa.security.LdapUserDetailsService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -17,6 +20,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -37,8 +41,9 @@ public class AuthController {
     
     @PostMapping("/ldapLogin")
     @Operation(summary = "Authenticate user and generate JWT token")
-    public ResponseEntity<?> login(@RequestBody LoginDto loginDto) {
-    	ldapService.loadUserByUsername(loginDto.getUsername());
+    public ResponseEntity<?> login(@RequestBody @Valid LoginDto loginDto , BindingResult bindingresult) {
+    	
+    	UserDetails loadUserByUsername = ldapService.loadUserByUsername(loginDto.getUsername());
         try {
             // Authenticate the user
      
@@ -53,7 +58,7 @@ public class AuthController {
             return ResponseEntity.ok(loginResponse);
 
         } catch (BadCredentialsException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
+        	throw new ResourceNotFoundException("Invalid Password: " + loginDto.getPassword());
         } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication failed: " + e.getMessage());
         } catch (Exception e) {

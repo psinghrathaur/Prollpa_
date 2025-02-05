@@ -2,6 +2,8 @@ package com.prollpa.entity;
 
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,7 +29,12 @@ public class Role {
 	private long roleId;
 	private String role;
 	@OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
+	@JsonIgnore
     private Set<UserVscRole> userVscRoles;
+	
+	@OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
+	@JsonIgnore
+    private Set<UserRole> userRole;
 	
 
 }

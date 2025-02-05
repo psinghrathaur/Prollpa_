@@ -9,7 +9,7 @@ import com.prollpa.entity.VSC;
 import lombok.Data;
 @Data
 public class UserVscRoleResponse {
-	private int vsc_id;
-    private String vsc_center_name;
-    private List<Role> role;
+	private Long vscId;
+    private String vscCenterName;
+    private List<RoleDto> role;
 }

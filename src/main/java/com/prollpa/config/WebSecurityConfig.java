@@ -117,7 +117,7 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthFilter jwtAuthFilter) throws Exception {
         http
-            .csrf().disable()
+            .csrf().disable().cors().and()
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                 		"/auth/**",          // your authentication endpoints
