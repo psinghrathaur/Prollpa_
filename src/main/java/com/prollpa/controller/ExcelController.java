@@ -46,7 +46,12 @@ public class ExcelController {
 	public ResponseEntity<byte[]> convertExcelToJson(
 	        @RequestParam("file") MultipartFile file,
 	        @RequestParam(value = "sheetName", required = false, defaultValue = "") String sheetName) {
-
+		String contentType = file.getContentType();
+		
+	    if (contentType == null || (!contentType.equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") 
+	            && !contentType.equals("application/vnd.ms-excel"))) {
+	        throw new ResourceNotFoundException("Invalid file type. Please upload an Excel file (.xls or .xlsx).");
+	    }
 	    // File Validation
 	    if (file == null || file.isEmpty()) {
 	        logger.warn("Uploaded file is null or empty");
@@ -86,9 +91,7 @@ public class ExcelController {
 	                .body(jsonBytes);
 
 	    } catch (Exception e) {
-	        logger.error("Error processing file: {}", e.getMessage(), e);
-	        return ResponseEntity.status(500)
-	                .body(("Error processing file: " + e.getMessage()).getBytes());
+	        throw new ResourceNotFoundException(e.getMessage());
 	    }
 	}
 	

@@ -58,7 +58,7 @@ public class AuthController {
             return ResponseEntity.ok(loginResponse);
 
         } catch (BadCredentialsException e) {
-        	throw new ResourceNotFoundException("Invalid Password: " + loginDto.getPassword());
+        	throw new ResourceNotFoundException("Invalid Password: " );
         } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication failed: " + e.getMessage());
         } catch (Exception e) {

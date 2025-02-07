@@ -125,8 +125,8 @@ public class WebSecurityConfig {
                         "/v3/api-docs/**",   // swagger docs
                         "/swagger-ui.html",
                         "/v3/api-docs/com.prollpa",
-                        "/swagger-ui/oauth2-redirect.html",
-                        "/excel/**"// access to swagger html
+                        "/swagger-ui/oauth2-redirect.html"
+//                        "/excel/**"// access to swagger html
                 ).permitAll()
                 .anyRequest().authenticated()
             )
